@@ -8,7 +8,7 @@ using InventoryProgram.Data;
 using InventoryProgram.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
-using Inventory.Service;
+using InventoryProgram.Service;
 using System.Reflection.Metadata.Ecma335;
 
 namespace InventoryProgram.Controllers
@@ -23,7 +23,7 @@ namespace InventoryProgram.Controllers
         {
             _context = context;
         }
-        //
+        //Check login credentials
         [HttpPost]
         public async Task<object> LoginUser([FromBody] UserInfos body)
         {
@@ -38,7 +38,7 @@ namespace InventoryProgram.Controllers
                 return Unauthorized();
             }
         }
-
+        //Make a new user account
         [HttpPost("signup")]
         public async Task<object> CreateUser([FromBody] Data.UserInfos user)
         {

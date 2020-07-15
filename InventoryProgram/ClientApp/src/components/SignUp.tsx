@@ -4,6 +4,7 @@ import { actionCreators, WeatherForecast, LoginBodyRequest, } from '../store/Wea
 import { useDispatch, batch } from "react-redux";
 import { push } from "connected-react-router";
 
+//Signup page to create new user
 const SignUp = () => {
     const [userName, setUserName] = useState<string>("");
     const [password, setPassword] = useState<string>("");

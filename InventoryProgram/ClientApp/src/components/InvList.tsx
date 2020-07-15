@@ -16,9 +16,11 @@ interface Props {
     deleteInventory: (id: number, index: number) => void;
     forecasts: WeatherForecast[];
     putInventory: (newBody: WeatherForecast, index: number, id: number) => void;
+    sortInventory: (sort: number) => void;
+
 }
 
-function InvList({ isLoading, getInventory, postInventory, deleteInventory, forecasts, putInventory }: Props) {
+function InvList({ isLoading, getInventory, postInventory, deleteInventory, forecasts, putInventory, sortInventory }: Props) {
     const [modelName, setModelName] = useState<string>("");
     const [serialNumber, setSerialNumber] = useState<string>("");
     const [hostName, setHostName] = useState<string>("");
@@ -39,12 +41,29 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, fore
     useEffect(() => {
         getInventory!();
     }, [])
-
+    //Confirms new products added and adds to database
     const testBody = () => {
         let item = { modelName: modelName, serialNumber: serialNumber, hostName: hostName, ipAddress: ipAddress, category: category, owner: owner, location: location } as WeatherForecast
         postInventory(item)
         setShowAdd(!setShowAdd)
     }
+    //Deletes a product from inventory list
+    const testBodyTwo = (id: number) => {
+        var x = findItem(id, forecasts)
+        deleteInventory(id, x);
+    }
+    //Edits a product from inventory list
+    const testBodyThree = (id: number, list: WeatherForecast[]) => {
+        let item = { modelName: newModelName, serialNumber: newSerialNumber, hostName: newHostName, ipAddress: newIpAddress, category: newCategory, owner: newOwner, location: newLocation } as WeatherForecast
+        console.log(list)
+        console.log(findItem(item.id, list))
+        putInventory(item, findItem(item.id, list) + 1, id)
+        setIsEditing(0)
+    }
+    const testBodyFour = (sort: number) => {
+        sortInventory (sort)
+    }
+
 
     const selectEdit = (item: WeatherForecast) => {
         setNewModelName(item.modelName)
@@ -55,18 +74,6 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, fore
         setNewOwner(item.owner)
         setNewLocation(item.location)
         setIsEditing(item.id)
-    }
-    const testBodyTwo = (id: number) => {
-        var x = findItem(id, forecasts)
-        deleteInventory(id, x);
-    }
-
-    const testBodyThree = (id: number, list: WeatherForecast[]) => {
-        let item = { modelName: newModelName, serialNumber: newSerialNumber, hostName: newHostName, ipAddress: newIpAddress, category: newCategory, owner: newOwner, location: newLocation } as WeatherForecast
-        console.log(list)
-        console.log(findItem(item.id, list))
-        putInventory(item, findItem(item.id, list) + 1, id)
-        setIsEditing(0)
     }
     //Add New Product button with fields to input new product information, table with data as well as delete and edit functions
     return (
@@ -117,16 +124,15 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, fore
 
                 <thead>
                     <tr>
-                        <th>Model Name</th>
-                        <th>Serial Number</th>
-                        <th>Hostname</th>
-                        <th>IP Address</th>
-                        <th>Category</th>
-                        <th>Owner</th>
-                        <th>Location</th>
-                        <th>Remove</th>
-                        <th>Edit</th>
-
+                        <th><span style={{ cursor: "pointer" }} onClick={() => testBodyFour(1)}>Model Name</span></th>
+                        <th><span style={{ cursor: "pointer" }} onClick={() => testBodyFour(2)}>Serial Number</span></th>
+                        <th><span style={{ cursor: "pointer" }} onClick={() => testBodyFour(3)}>Hostname</span></th>
+                        <th><span style={{ cursor: "pointer" }} onClick={() => testBodyFour(4)}>IP Address</span></th>
+                        <th><span style={{ cursor: "pointer" }} onClick={() => testBodyFour(5)}>Category</span></th>
+                        <th><span style={{ cursor: "pointer" }} onClick={() => testBodyFour(6)}>Owner</span></th>
+                        <th><span style={{ cursor: "pointer" }} onClick={() => testBodyFour(7)}>Location</span></th>
+                        <th><span>Remove</span></th>
+                        <th><span>Edit</span></th> 
                     </tr>
                 </thead>
 
@@ -184,7 +190,8 @@ const mapDispatchToProps = (dispatch: (arg0: any) => void) => ({
     getInventory: () => dispatch(actionCreators.requestWeatherForecasts()),
     postInventory: (body: WeatherForecast) => dispatch(actionCreators.postWeatherForecasts(body)),
     deleteInventory: (id: number, index: number) => dispatch(actionCreators.deleteInvList(id, index)),
-    putInventory: (newBody: WeatherForecast, index: number, id: number) => dispatch(actionCreators.putNewInventory(newBody, index, id))
+    putInventory: (newBody: WeatherForecast, index: number, id: number) => dispatch(actionCreators.putNewInventory(newBody, index, id)),
+    sortInventory: (sort: number) => dispatch(actionCreators.postSortedList(sort))
 });
 
 const findItem = (id: number, lists: any[]) => {

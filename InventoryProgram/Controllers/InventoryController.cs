@@ -33,6 +33,7 @@ namespace InventoryProgram.Controllers
             await _context.SaveChangesAsync();
             return inventory;
         }
+
         //Delete a product from Inventory List
         [HttpDelete("delete/{id}")]
         public async Task<ActionResult> DeleteInventory([FromRoute] int id)
@@ -68,6 +69,46 @@ namespace InventoryProgram.Controllers
 
             return Ok();
         }
+
+        //Sorting inventory list 
+        [HttpPost("sort")]
+        public async Task<object> GetSortedList([FromBody] int sortChoice)
+        {
+            var allItems = await _context.Inventory.ToListAsync();
+            List<InventoryProgram.Data.Inventory> returnList = new List<InventoryProgram.Data.Inventory>();
+
+            if (sortChoice == 1)
+            {
+                returnList = allItems.OrderBy(inv => inv.ModelName).ToList();
+            }
+            else if (sortChoice == 2)
+            {
+                returnList = allItems.OrderBy(inv => inv.SerialNumber).ToList();
+            }
+            else if (sortChoice == 3)
+            {
+                returnList = allItems.OrderBy(inv => inv.HostName).ToList();
+            }
+            else if (sortChoice == 4)
+            {
+                returnList = allItems.OrderBy(inv => inv.IpAddress).ToList();
+            }
+            else if (sortChoice == 5)
+            {
+                returnList = allItems.OrderBy(inv => inv.Category).ToList();
+            }
+            else if (sortChoice == 6)
+            {
+                returnList = allItems.OrderBy(inv => inv.Owner).ToList();
+            }
+            else if (sortChoice == 7)
+            {
+                returnList = allItems.OrderBy(inv => inv.Location).ToList();
+            }
+
+            return returnList;
+        }
+
 
 
     }

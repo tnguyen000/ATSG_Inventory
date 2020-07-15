@@ -7,7 +7,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Service
+
+
+namespace InventoryProgram.Service
 {
     public class JWTService
     {

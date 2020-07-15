@@ -3,6 +3,7 @@ import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLi
 import { Link } from 'react-router-dom';
 import './NavMenu.css';
 
+//Navigation menu
 export default class NavMenu extends React.PureComponent<{}, { isOpen: boolean }> {
     public state = {
         isOpen: false

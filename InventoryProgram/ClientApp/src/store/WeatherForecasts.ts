@@ -72,6 +72,7 @@ type KnownAction = RequestWeatherForecastsAction | ReceiveWeatherForecastsAction
 export const actionCreators = {
     requestWeatherForecasts: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
         // Only load data if it's something we don't already have (and are not already loading)
+        //Request to show inventory data
         const appState = getState();
         if (appState && appState.weatherForecasts) {
             fetch(`inventory`)
@@ -83,7 +84,7 @@ export const actionCreators = {
             dispatch({ type: 'REQUEST_WEATHER_FORECASTS' });
         }
     },
-    //POST request to add a new product to inventory lust
+    //POST request to add a new product to inventory list
     postWeatherForecasts: (newForecastData: WeatherForecast): AppThunkAction<KnownAction> => (dispatch, getState) => {
         const appState = getState();
         if (appState) {
@@ -187,6 +188,25 @@ export const actionCreators = {
             dispatch({ type: 'POST_WEATHER_FORECASTS_REQUEST' })
         }
     },
+    //POST request to get sorted list
+    postSortedList: (newBody: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        const appState = getState();
+        if (appState) {
+            fetch(`inventory/sort`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newBody)
+            })
+                .then(response => response.json() as Promise<WeatherForecast[]>)
+                .then(data => {
+                    dispatch({
+                        type: 'RECEIVE_WEATHER_FORECASTS', forecasts: data})
+                });
+            dispatch({ type: 'POST_WEATHER_FORECASTS_REQUEST' })
+        }
+    },
 }
 
 // ----------------
@@ -225,13 +245,6 @@ export const reducer: Reducer<WeatherForecastsState> = (state: WeatherForecastsS
                 forecasts: state.forecasts,
                 isLoading: true
             }
-        case 'POST_WEATHER_FORECASTS':
-            var thing = state.forecasts
-            thing.push(action.body)
-            return {
-                forecasts: thing,
-                isLoading: false
-            }
         case 'DELETE_ITEM_RESPONSE':
             state.forecasts.splice(action.body, 1)
             return {
@@ -244,7 +257,6 @@ export const reducer: Reducer<WeatherForecastsState> = (state: WeatherForecastsS
                 forecasts: state.forecasts,
                 isLoading: false
             }
-
     }
 
     return state;
