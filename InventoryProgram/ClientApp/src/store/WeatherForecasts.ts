@@ -75,7 +75,7 @@ export const actionCreators = {
         //Request to show inventory data
         const appState = getState();
         if (appState && appState.weatherForecasts) {
-            fetch(`inventory`)
+            fetch(`/api/inventory`)
                 .then(response => response.json() as Promise<WeatherForecast[]>)
                 .then(data => {
                     dispatch({ type: 'RECEIVE_WEATHER_FORECASTS', forecasts: data });
@@ -88,7 +88,7 @@ export const actionCreators = {
     postWeatherForecasts: (newForecastData: WeatherForecast): AppThunkAction<KnownAction> => (dispatch, getState) => {
         const appState = getState();
         if (appState) {
-            fetch(`inventory`, {
+            fetch(`/api/inventory`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -151,7 +151,7 @@ export const actionCreators = {
     deleteInvList: (id: number, index: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
         const appState = getState();
         if (appState) {
-            fetch(`inventory/delete/${id}`, {
+            fetch(`/api/inventory/delete/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -167,11 +167,11 @@ export const actionCreators = {
             dispatch({ type: 'POST_WEATHER_FORECASTS_REQUEST' })
         }
     },
-    //PUT request to edit product information in onventory list
+    //PUT request to edit and update product information in inventory list
     putNewInventory: (newBody: WeatherForecast, index: number, id: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
         const appState = getState();
         if (appState) {
-            fetch(`inventory/update/${id}`, {
+            fetch(`/api/inventory/update/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -192,7 +192,7 @@ export const actionCreators = {
     postSortedList: (newBody: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
         const appState = getState();
         if (appState) {
-            fetch(`inventory/sort`, {
+            fetch(`/api/inventory/sort`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -205,6 +205,29 @@ export const actionCreators = {
                         type: 'RECEIVE_WEATHER_FORECASTS', forecasts: data})
                 });
             dispatch({ type: 'POST_WEATHER_FORECASTS_REQUEST' })
+        }
+    },
+    //GET request to search for product
+    requestSearch: (input: string): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        const appState = getState();
+        if (appState && appState.weatherForecasts) {
+            if (input === undefined) {
+                input = ""
+            }
+
+            fetch(`/api/inventory/search`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(input)
+            })
+                .then(response => response.json() as Promise<WeatherForecast[]>)
+                .then(data => {
+                    dispatch({ type: 'RECEIVE_WEATHER_FORECASTS', forecasts: data });
+                });
+
+            dispatch({ type: 'REQUEST_WEATHER_FORECASTS' });
         }
     },
 }

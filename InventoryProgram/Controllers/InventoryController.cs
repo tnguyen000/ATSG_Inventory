@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace InventoryProgram.Controllers
 {
     [ApiController]
-    [Route("inventory")]
+    [Route("/api/inventory")]
     public class InventoryController : ControllerBase
     {
         private InventoryContext _context;
@@ -108,8 +108,16 @@ namespace InventoryProgram.Controllers
 
             return returnList;
         }
-
-
-
+        //Search inventory list
+        [HttpPost("search")]
+        public async Task<ActionResult<object>> SearchInventory([FromBody] string requestSearch)
+        {
+            var results = await _context.Inventory.Where(c => c.SerialNumber.Contains(requestSearch)).ToListAsync();
+            if (results == null)
+            {
+                return NoContent();
+            }
+            return Ok(results);
+        }
     }
 }

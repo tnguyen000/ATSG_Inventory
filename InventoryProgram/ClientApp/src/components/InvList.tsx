@@ -7,6 +7,7 @@ import { actionCreators, WeatherForecast, LoginBodyRequest } from '../store/Weat
 import { Button } from 'reactstrap';
 import { useDispatch, batch } from "react-redux";
 import { push } from "connected-react-router";
+import { Typeahead } from 'react-bootstrap-typeahead';
 
 
 interface Props {
@@ -17,10 +18,10 @@ interface Props {
     forecasts: WeatherForecast[];
     putInventory: (newBody: WeatherForecast, index: number, id: number) => void;
     sortInventory: (sort: number) => void;
-
+    requestSearch: (input: string) => void;
 }
 
-function InvList({ isLoading, getInventory, postInventory, deleteInventory, forecasts, putInventory, sortInventory }: Props) {
+function InvList({ isLoading, getInventory, postInventory, deleteInventory, forecasts, putInventory, sortInventory, requestSearch }: Props) {
     const [modelName, setModelName] = useState<string>("");
     const [serialNumber, setSerialNumber] = useState<string>("");
     const [hostName, setHostName] = useState<string>("");
@@ -37,6 +38,7 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, fore
     const [newCategory, setNewCategory] = useState<string>("");
     const [newOwner, setNewOwner] = useState<string>("");
     const [newLocation, setNewLocation] = useState<string>("");
+    const [showSearch, setShowSearch] = useState<boolean>(false);
 
     useEffect(() => {
         getInventory!();
@@ -60,10 +62,10 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, fore
         putInventory(item, findItem(item.id, list) + 1, id)
         setIsEditing(0)
     }
+    //Sorts selected header row by ascending order
     const testBodyFour = (sort: number) => {
         sortInventory (sort)
     }
-
 
     const selectEdit = (item: WeatherForecast) => {
         setNewModelName(item.modelName)
@@ -75,7 +77,7 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, fore
         setNewLocation(item.location)
         setIsEditing(item.id)
     }
-    //Add New Product button with fields to input new product information, table with data as well as delete and edit functions
+    //Add New Product button with fields to input new product information, search product serial number, table with data as well as delete and edit functions
     return (
         <React.Fragment><div>
 
@@ -120,6 +122,14 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, fore
                 <button onClick={testBody}>Confirm</button>
             </div>) : null}
 
+            <Typeahead
+                placeholder="Search for a serial number"
+                options={getStringSerials(forecasts)}
+                onChange={(selected) => {
+                   requestSearch(selected[0]);
+                }}
+            />
+           
             {isLoading ? (<b>Loading...</b>) : (<table className='table table-striped' style={{ maxWidth: "90%" }} aria-labelledby="tabelLabel">
 
                 <thead>
@@ -159,7 +169,7 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, fore
                             <td>{info.owner}</td>
                             <td>{info.location}</td>
                             <td><button onClick={() => testBodyTwo(info.id)}>Trash</button></td>
-                            <td><button onClick={() => selectEdit(info)}>Pencil</button></td>
+                            <td><button onClick={() => selectEdit(info)}>Edit</button></td>
                         </tr>)
                         }
                     </tbody>
@@ -175,6 +185,11 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, fore
     );
 }
 
+const getStringSerials = (forecasts: WeatherForecast[]) => {
+    var string = [""]
+    forecasts.forEach(element => string.push(element.serialNumber))
+    return string
+}
 
 const mapStateToProps = (state: {
     weatherForecasts: {
@@ -191,7 +206,8 @@ const mapDispatchToProps = (dispatch: (arg0: any) => void) => ({
     postInventory: (body: WeatherForecast) => dispatch(actionCreators.postWeatherForecasts(body)),
     deleteInventory: (id: number, index: number) => dispatch(actionCreators.deleteInvList(id, index)),
     putInventory: (newBody: WeatherForecast, index: number, id: number) => dispatch(actionCreators.putNewInventory(newBody, index, id)),
-    sortInventory: (sort: number) => dispatch(actionCreators.postSortedList(sort))
+    sortInventory: (sort: number) => dispatch(actionCreators.postSortedList(sort)),
+    requestSearch: (input: string) => dispatch(actionCreators.requestSearch(input))
 });
 
 const findItem = (id: number, lists: any[]) => {
