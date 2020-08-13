@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using InventoryProgram.Data;
-using InventoryProgram.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using InventoryProgram.Service;
 using System.Reflection.Metadata.Ecma335;
+using InventoryProgram.Data.Models;
 
 namespace InventoryProgram.Controllers
 {
@@ -28,11 +27,10 @@ namespace InventoryProgram.Controllers
         public async Task<object> LoginUser([FromBody] UserInfos body)
         {
             var user = await _context.UserInfos.FirstOrDefaultAsync(c => c.Username == body.Username);
-            if (user.Password == body.Password)
+            if (user != null)
             {
-                return Ok(JWTService.GetToken(user.Id.ToString(), user.Username));
+                return Ok( new { key = JWTService.GetToken(user.Id.ToString(), user.Username), accessType = user.Access });
             }
-
             else
             {
                 return Unauthorized();
@@ -40,7 +38,7 @@ namespace InventoryProgram.Controllers
         }
         //Make a new user account
         [HttpPost("signup")]
-        public async Task<object> CreateUser([FromBody] Data.UserInfos user)
+        public async Task<object> CreateUser([FromBody] UserInfos user)
         {
             await _context.UserInfos.AddAsync(user);
             await _context.SaveChangesAsync();

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using InventoryProgram.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using System.Security.Claims;
 
 namespace InventoryProgram.Controllers
 {
@@ -20,14 +22,19 @@ namespace InventoryProgram.Controllers
             _context = context;
         }
         //Shows data from database
-        [HttpGet]
-        public async Task<object> GetAsync()
+        [HttpGet("{id}")]
+        public async Task<object> GetAsync([FromRoute]string id)
         {
-            return await _context.Inventory.ToListAsync();
+            var owners = await _context.Owner.ToListAsync();
+            var locations= await _context.Locations.ToListAsync();
+            var categories = await _context.Categories.ToListAsync();
+            var user = await _context.UserInfos.FindAsync(Int32.Parse(id));
+            var type = await _context.Inventory.ToListAsync();
+            return new { items = type, accessType = user.Id, categories = categories, locations = locations, owners = owners}; 
         }
         //Add a product to Inventory List
         [HttpPost]
-        public async Task<object> PostAsync([FromBody] Data.Inventory inventory)
+        public async Task<object> PostAsync([FromBody] InventoryProgram.Data.Models.Inventory inventory)
         {
             await _context.Inventory.AddAsync(inventory);
             await _context.SaveChangesAsync();
@@ -51,7 +58,7 @@ namespace InventoryProgram.Controllers
 
         //Edit and update product in Inventory List
         [HttpPut("update/{id}")]
-        public async Task<ActionResult> EditInventory([FromRoute] int id, [FromBody] InventoryProgram.Data.Inventory body)
+        public async Task<ActionResult> EditInventory([FromRoute] int id, [FromBody] InventoryProgram.Data.Models.Inventory body)
         {
             var inventory = await _context.Inventory.FindAsync(id);
             if (inventory == null)
@@ -67,7 +74,7 @@ namespace InventoryProgram.Controllers
             inventory.Location = body.Location;
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(inventory);
         }
 
         //Sorting inventory list 
@@ -75,7 +82,7 @@ namespace InventoryProgram.Controllers
         public async Task<object> GetSortedList([FromBody] int sortChoice)
         {
             var allItems = await _context.Inventory.ToListAsync();
-            List<InventoryProgram.Data.Inventory> returnList = new List<InventoryProgram.Data.Inventory>();
+            List<InventoryProgram.Data.Models.Inventory> returnList = new List<InventoryProgram.Data.Models.Inventory>();
 
             if (sortChoice == 1)
             {
@@ -112,12 +119,29 @@ namespace InventoryProgram.Controllers
         [HttpPost("search")]
         public async Task<ActionResult<object>> SearchInventory([FromBody] string requestSearch)
         {
-            var results = await _context.Inventory.Where(c => c.SerialNumber.Contains(requestSearch)).ToListAsync();
-            if (results == null)
+            var inventories = await _context.Inventory.ToListAsync();
+
+            Dictionary<int, int> items = new Dictionary<int, int>();
+            foreach (var item in inventories)
             {
-                return NoContent();
+                int count = 0;
+                foreach (var prop in item.GetType().GetProperties())
+                {
+                    if (prop.GetValue(item).ToString().ToLower().Contains(requestSearch.ToLower()))
+                    {
+                        count++;
+                    }
+                }
+                items[inventories.IndexOf(item)] = count;
             }
-            return Ok(results);
+
+            List<Data.Models.Inventory> info = new List<Data.Models.Inventory>();
+            foreach (var item in items)
+            {
+               if (item.Value > 0)
+                    info.Add(inventories[item.Key]);
+            }
+            return Ok(info);
         }
     }
 }

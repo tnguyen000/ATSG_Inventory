@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { actionCreators, WeatherForecast, LoginBodyRequest } from '../store/WeatherForecasts';
+import { actionCreators, InventoryItem, LoginBodyRequest } from '../store/InventoryItems';
 import { useDispatch, batch } from "react-redux";
 import { push } from "connected-react-router";
 
@@ -12,7 +12,6 @@ const Login = () => {
     const testBody = () => {
         let item = { username: userName, password: password } as LoginBodyRequest
         dispatch(actionCreators.postLoginUser(item))
-        dispatch(push('/InvList'))
     }
     const testBodyTwo = () => {
         dispatch(push('/SignUp'))

@@ -2,12 +2,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace InventoryProgram.Data
+namespace InventoryProgram.Data.Models
 {
-    public partial class UserInfos
+    public partial class Categories
     {
         public int Id { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -2,30 +2,16 @@
    "ContextClassName": "InventoryContext",
    "ContextNamespace": null,
    "DefaultDacpacSchema": null,
+   "DoNotCombineNamespace": false,
+   "IdReplace": false,
    "IncludeConnectionString": false,
    "ModelNamespace": null,
    "OutputContextPath": null,
-   "OutputPath": "Models",
-   "ProjectRootNamespace": "InventoryProgram.Data",
+   "OutputPath": null,
+   "ProjectRootNamespace": "InventoryProgram",
    "SelectedHandlebarsLanguage": 0,
    "SelectedToBeGenerated": 0,
    "Tables": [
-      {
-         "HasPrimaryKey": true,
-         "Name": "[dbo].[Categories]"
-      },
-      {
-         "HasPrimaryKey": true,
-         "Name": "[dbo].[Inventory]"
-      },
-      {
-         "HasPrimaryKey": true,
-         "Name": "[dbo].[Locations]"
-      },
-      {
-         "HasPrimaryKey": true,
-         "Name": "[dbo].[Owner]"
-      },
       {
          "HasPrimaryKey": true,
          "Name": "[dbo].[UserInfos]"
@@ -37,7 +23,5 @@
    "UseHandleBars": false,
    "UseInflector": false,
    "UseLegacyPluralizer": false,
-   "UseNodaTime": false,
-   "UseSpatial": false,
-   "UseStoredProcedures": false
+   "UseSpatial": false
 }

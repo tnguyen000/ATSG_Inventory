@@ -9,9 +9,8 @@ import './custom.css'
 
 export default () => (
     <Layout>
-        <Route exact path='/' component={Home} />
+        <Route exact path='/' component={Login} />
         <Route path='/invlist/:startDateIndex?' component={InvList} />
-        <Route path='/login' component={Login} />
         <Route path='/signup' component={SignUp} />
     </Layout>
 );

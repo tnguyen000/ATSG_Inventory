@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace InventoryProgram.Data
+namespace InventoryProgram.Data.Models
 {
     public partial class Inventory
     {

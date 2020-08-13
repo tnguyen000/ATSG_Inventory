@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { actionCreators, WeatherForecast, LoginBodyRequest, } from '../store/WeatherForecasts';
+import { actionCreators, InventoryItem, LoginBodyRequest, } from '../store/InventoryItems';
 import { useDispatch, batch } from "react-redux";
 import { push } from "connected-react-router";
 
