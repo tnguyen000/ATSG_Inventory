@@ -1,0 +1,9 @@
+C:\Users\tnguyen\Desktop\InventoryProgram\InventoryProgram.Data\bin\Release\netstandard2.0\InventoryProgram.Data.deps.json
+C:\Users\tnguyen\Desktop\InventoryProgram\InventoryProgram.Data\bin\Release\netstandard2.0\InventoryProgram.Data.dll
+C:\Users\tnguyen\Desktop\InventoryProgram\InventoryProgram.Data\bin\Release\netstandard2.0\InventoryProgram.Data.pdb
+C:\Users\tnguyen\Desktop\InventoryProgram\InventoryProgram.Data\obj\Release\netstandard2.0\InventoryProgram.Data.csprojAssemblyReference.cache
+C:\Users\tnguyen\Desktop\InventoryProgram\InventoryProgram.Data\obj\Release\netstandard2.0\InventoryProgram.Data.AssemblyInfoInputs.cache
+C:\Users\tnguyen\Desktop\InventoryProgram\InventoryProgram.Data\obj\Release\netstandard2.0\InventoryProgram.Data.AssemblyInfo.cs
+C:\Users\tnguyen\Desktop\InventoryProgram\InventoryProgram.Data\obj\Release\netstandard2.0\InventoryProgram.Data.csproj.CoreCompileInputs.cache
+C:\Users\tnguyen\Desktop\InventoryProgram\InventoryProgram.Data\obj\Release\netstandard2.0\InventoryProgram.Data.dll
+C:\Users\tnguyen\Desktop\InventoryProgram\InventoryProgram.Data\obj\Release\netstandard2.0\InventoryProgram.Data.pdb

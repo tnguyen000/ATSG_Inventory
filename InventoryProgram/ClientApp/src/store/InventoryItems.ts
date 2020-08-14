@@ -33,6 +33,7 @@ export interface InventoryItem {
 export interface LoginBodyRequest {
     username: string;
     password: string;
+    access: number;
 }
 
 
@@ -46,6 +47,12 @@ interface RequestInventoryItemsAction {
 
 interface ReceiveInventoryItemssAction {
     type: 'RECEIVE_INVENTORY_ITEMS';
+    items: any;
+}
+
+
+interface ReceiveInventoryItemssActio2n {
+    type: 'RECEIVE_INVENTORY_ITEMS_2';
     items: InventoryItem[];
 }
 
@@ -75,7 +82,7 @@ interface DeleteItemResponse {
 }
 // Declare a 'discriminated union' type. This guarantees that all references to 'type' properties contain one of the
 // declared type strings (and not any other arbitrary string).
-type KnownAction = RequestInventoryItemsAction | ReceiveLoginRequest | ReceiveInventoryItemssAction | PostInventoryItemsAction | PostInventoryItemsActionRequest | DeleteItemResponse | UpdateInventoryItemsAction | CallHistoryMethodAction;
+type KnownAction = RequestInventoryItemsAction | ReceiveLoginRequest | ReceiveInventoryItemssAction | PostInventoryItemsAction | PostInventoryItemsActionRequest | DeleteItemResponse | UpdateInventoryItemsAction | CallHistoryMethodAction | ReceiveInventoryItemssActio2n;
 
 // ----------------
 // ACTION CREATORS - These are functions exposed to UI components that will trigger a state transition.
@@ -90,7 +97,8 @@ export const actionCreators = {
             fetch(`/api/inventory`)
                 .then(response => response.json() as Promise<any>)
                 .then(data => {
-                    dispatch({ type: 'RECEIVE_INVENTORY_ITEMS', items: data.items });
+                    console.log(data)
+                    dispatch({ type: 'RECEIVE_INVENTORY_ITEMS', items: data });
                 });
 
             dispatch({ type: 'REQUEST_INVENTORY_ITEMS' });
@@ -137,9 +145,9 @@ export const actionCreators = {
                     if (data) {
                         sessionStorage.setItem(AUTH_KEY, data.key);
                         console.log(data)
-                        
+
+                        dispatch({ type: 'LOGIN_SET_ACCESS', body: data.accessType }) 
                         dispatch(routerActions.push('/InvList'));
-                        dispatch({ type: 'LOGIN_SET_ACCESS', body: data.accessType })
                     }
                 });
             dispatch({ type: 'POST_INVENTORY_ITEMS_REQUEST' })
@@ -161,6 +169,45 @@ export const actionCreators = {
                     dispatch({ type: 'POST_INVENTORY_ITEMS', body: data })
                 });
             dispatch({ type: 'POST_INVENTORY_ITEMS_REQUEST' })
+        }
+    },
+    //POST request to add a newcategory to dropdown list
+    postNewCategory: (newInventoryData: string): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        const appState = getState();
+        if (appState) {
+            fetch(`api/inventory/category`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newInventoryData)
+            })
+        }
+    },
+    //POST request to add a new owner to dropdown list
+    postNewOwner: (newInventoryData: string): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        const appState = getState();
+        if (appState) {
+            fetch(`api/inventory/owner`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newInventoryData)
+            })
+        }
+    },
+    //POST request to add a new location to dropdown list
+    postNewLocation: (newInventoryData: string): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        const appState = getState();
+        if (appState) {
+            fetch(`api/inventory/location`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newInventoryData)
+            })
         }
     },
     //DELETE request to delete a product from inventory list
@@ -196,6 +243,7 @@ export const actionCreators = {
             })
                 .then(response => {
                     if (response.status === 200) {
+                        console.log("Withing putNewInventory: " + index)
                         dispatch({ type: 'UPDATE_INVENTORY_ITEMS', body: newBody, index: index })
                     } else {
                         alert('Error editing.');
@@ -218,7 +266,7 @@ export const actionCreators = {
                 .then(response => response.json() as Promise<InventoryItem[]>)
                 .then(data => {
                     dispatch({
-                        type: 'RECEIVE_INVENTORY_ITEMS', items: data})
+                        type: 'RECEIVE_INVENTORY_ITEMS_2', items: data})
                 });
             dispatch({ type: 'POST_INVENTORY_ITEMS_REQUEST' })
         }
@@ -240,7 +288,7 @@ export const actionCreators = {
             })
                 .then(response => response.json() as Promise<InventoryItem[]>)
                 .then(data => {
-                    dispatch({ type: 'RECEIVE_INVENTORY_ITEMS', items: data });
+                    dispatch({ type: 'RECEIVE_INVENTORY_ITEMS_2', items: data });
                 });
 
             dispatch({ type: 'REQUEST_INVENTORY_ITEMS' });
@@ -269,6 +317,19 @@ export const reducer: Reducer<InventoryItemsState> = (state: InventoryItemsState
                 locations: state.locations
             };
         case 'RECEIVE_INVENTORY_ITEMS':
+            // Only accept the incoming data if it matches the most recent request. This ensures we correctly
+            // handle out-of-order responses.
+            console.log(action.items)
+            return {
+                items: action.items.items,
+                isLoading: false,
+                accessType: state.accessType,
+                owners: action.items.owners,
+                categories: action.items.categories,
+                locations: action.items.locations
+            };
+            break;
+        case 'RECEIVE_INVENTORY_ITEMS_2':
             // Only accept the incoming data if it matches the most recent request. This ensures we correctly
             // handle out-of-order responses.
             return {
@@ -311,6 +372,7 @@ export const reducer: Reducer<InventoryItemsState> = (state: InventoryItemsState
                 locations: state.locations
             }
         case 'UPDATE_INVENTORY_ITEMS':
+            console.log("action index: "  + action.index)
             state.items[action.index] = action.body
             return {
                 items: state.items,

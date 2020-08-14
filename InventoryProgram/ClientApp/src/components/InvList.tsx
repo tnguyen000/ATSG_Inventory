@@ -22,10 +22,15 @@ interface Props {
     putInventory: (newBody: InventoryItem, index: number, id: number) => void;
     sortInventory: (sort: number) => void;
     requestSearch: (input: string) => void;
+    owners: string[],
+    categories: string[],
+    locations: string[]
 }
 
-function InvList({ isLoading, getInventory, postInventory, deleteInventory, items, putInventory, sortInventory, requestSearch, accessType }: Props) {
-    const [token, setToken] = useState<string | null>();
+function InvList({ isLoading, getInventory, postInventory, deleteInventory, items, putInventory, sortInventory, requestSearch, accessType, owners, categories, locations }: Props) {
+    const [isAddingOwner, setIsAddingOwner] = useState<boolean>(false);
+    const [isAddingLocation, setIsAddingLocation] = useState<boolean>(false);
+    const [isAddingCategories, setIsAddingCategories] = useState<boolean>(false);
     const [modelName, setModelName] = useState<string>("");
     const [serialNumber, setSerialNumber] = useState<string>("");
     const [hostName, setHostName] = useState<string>("");
@@ -43,10 +48,13 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, item
     const [newOwner, setNewOwner] = useState<string>("");
     const [newLocation, setNewLocation] = useState<string>("");
     const [search, setSearch] = useState<string>("");
+    const [addNewCategory, setAddNewCategory] = useState<string>("");
+    const [addNewLocation, setAddNewLocation] = useState<string>("");
+    const [addNewOwner, setAddNewOwner] = useState<string>("");
     const dispatch = useDispatch();
-    console.log("access type: " + accessType)
-   
 
+   
+  
     useEffect(() => {
         getInventory!();
     }, [])
@@ -68,10 +76,12 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, item
     }
     //Edits a product from inventory list
     const testBodyThree = (id: number, list: InventoryItem[]) => {
-        let item = { modelName: newModelName, serialNumber: newSerialNumber, hostName: newHostName, ipAddress: newIpAddress, category: newCategory, owner: newOwner, location: newLocation } as InventoryItem
+        let item = { id: id, modelName: newModelName, serialNumber: newSerialNumber, hostName: newHostName, ipAddress: newIpAddress, category: newCategory, owner: newOwner, location: newLocation } as InventoryItem
         console.log(item)
-        putInventory(item, findItem(item.id, list), id)
-        setIsEditing(0)
+        if (id) {
+            putInventory(item, findItem(item.id, list), id)
+            setIsEditing(0)
+        }
     }
     //Sorts selected header row by ascending order
     const testBodyFour = (sort: number) => {
@@ -80,6 +90,21 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, item
     //Searches for product information 
     const testBodyFive = (search: string) => {
         requestSearch(search)   
+    }
+
+    const testBodySix = () => {
+        dispatch(actionCreators.postNewCategory(addNewCategory))
+        setIsAddingCategories(false)
+    }
+
+    const testBodySeven = () => {
+        dispatch(actionCreators.postNewOwner(addNewOwner))
+        setIsAddingOwner(false)
+    }
+
+    const testBodyEight = () => {
+        dispatch(actionCreators.postNewLocation(addNewLocation))
+        setIsAddingLocation(false)
     }
 
     const selectEdit = (item: InventoryItem) => {
@@ -97,6 +122,19 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, item
         <React.Fragment><div>
 
             {showAdd ? null : (<button onClick={() => setShowAdd(!showAdd)}>Add New Product</button>)}
+
+            {accessType === 0 ? (<div>
+                <p>For Dropdown List:</p>
+                {isAddingCategories ? (<div>
+                    <input onChange={(event) => setAddNewCategory(event.target.value)}></input>
+                    < button onClick={testBodySix}>Confirm</button><button onClick={() => setIsAddingCategories(false)}>Cancel</button></div>) : (<button onClick={() => setIsAddingCategories(true)}>Add New Category</button>)}
+                {isAddingOwner ? (<div>
+                    <input onChange={(event) => setAddNewOwner(event.target.value)}></input>
+                    <button onClick={testBodySeven}>Confirm</button><button onClick={() => setIsAddingOwner(false)}>Cancel</button></div>) : (<button onClick={() => setIsAddingOwner(true)}>Add New Owner</button>)}
+                {isAddingLocation ? (<div>
+                    <input onChange={(event) => setAddNewLocation(event.target.value)}></input>
+                    <button onClick={testBodyEight}>Confirm</button><button onClick={() => setIsAddingLocation(false)}>Cancel</button></div>) : (<button onClick={() => setIsAddingLocation(true)}>Add New Location</button>)}
+            </div>) : null}
 
             {showAdd ? (<div>
                 <div>
@@ -121,57 +159,31 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, item
                 <div>
                     <p>Category</p>
                     <select onChange={(event) => setCategory(event.target.value)}>
-                        <option onClick={() => setCategory("Audio System")}>Audio System</option>
-                        <option onClick={() => setCategory("Control System")}>Control System</option>
-                        <option onClick={() => setCategory("Digital Media Module")}>Digital Media Module</option>
-                        <option onClick={() => setCategory("Digital Media Switcher")}>Digital Media Module</option>
-                        <option onClick={() => setCategory("Ethernet Control Module")}>Ethernet Control Module</option>
-                        <option onClick={() => setCategory("Ethernet Switch")}>Ethernet Switch</option>
-                        <option onClick={() => setCategory("Modular Multi-Tuner")}>Modular Multi-Tuner</option>
-                        <option onClick={() => setCategory("Power Supply")}>Power Supply</option>
-                        <option onClick={() => setCategory("Touchless Panel")}>Touchless Panel</option>
-                        <option onClick={() => setCategory("Wireless Gateway")}>Wireless Gateway</option>
+                        {categories ? categories.map((body: any) => <option onClick={() => setCategory(body.name)}>{body.name}</option>) : null}
                     </select>
                 </div>
 
                 <div>
                     <p>Owner</p>
                     <select onChange={(event) => setOwner(event.target.value)}>
-                        <option onClick={() => setOwner("Barry Vandenberg")}>Barry Vandenberg</option>
-                        <option onClick={() => setOwner("Christopher Rossi")}>Christopher Rossi</option>
-                        <option onClick={() => setOwner("Cinto Frausto")}>Cinto Frausto</option>
-                        <option onClick={() => setOwner("DK Karnoscak")}>DK Karnoscak</option>
-                        <option onClick={() => setOwner("Eric Stover")}>Eric Stover</option>
-                        <option onClick={() => setOwner("James Gaylor")}>James Gaylor</option>
-                        <option onClick={() => setOwner("Lamont Moore")}>Lamont Moore</option>
-                        <option onClick={() => setOwner("Mark Reilly")}>Mark Reilly</option>
-                        <option onClick={() => setOwner("Robert Kirby")}>Robert Kirby</option>
-                        <option onClick={() => setOwner("Rodrigo Ceballos")}>Rodrigo Ceballos</option>
-                        <option onClick={() => setOwner("Ronnie Giron")}>Ronnie Giron</option>
-                        <option onClick={() => setOwner("Ryan Kasher")}>Ryan Kasher</option>
-                        <option onClick={() => setOwner("Ryan Kemper")}>Ryan Kemper</option>
-                        <option onClick={() => setOwner("Toby Ortiz")}>Toby Ortiz</option>
-                        <option onClick={() => setOwner("Tres Little")}>Tres Little</option>
-                        <option onClick={() => setOwner("William Resendez")}>William Resendez</option>
+                        {owners ? owners.map((body: any) => <option onClick={() => setOwner(body.name)}>{body.name}</option>) : null}
                     </select>
                 </div>
 
                 <div>
                     <p>Location</p>
                     <select onChange={(event) => setLocation(event.target.value)}>
-                        <option onClick={() => setLocation("New Jersey ATSG Lab")}>New Jersey ATSG Lab</option>
-                        <option onClick={() => setLocation("Plano ATSG Lab")}>Plano ATSG Lab</option>
-                        <option onClick={() => setLocation("ATSG Engineering Lab")}>ATSG Engineering Lab</option>
+                        {locations ? locations.map((body: any) => <option onClick={() => setLocation(body.name)}>{body.name}</option>) : null}
                     </select>
                 </div>
 
                 <button style={{ marginTop: "25px" }} onClick={() => setShowAdd(!showAdd)}>Cancel</button>
                 <button style={{ marginBottom: "25px" }} onClick={testBody}>Confirm</button>
             </div>) : null}
-            
+
             <p>Search for inventory</p>
             <input onChange={(event) => testBodyFive(event.target.value)}></input>
-           
+
             {isLoading ? (<b>Loading...</b>) : (<table className='table table-striped' style={{ maxWidth: "90%" }} aria-labelledby="tabelLabel">
 
                 <thead>
@@ -184,8 +196,8 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, item
                         <th><span style={{ cursor: "pointer" }} onClick={() => testBodyFour(6)}>Owner</span></th>
                         <th><span style={{ cursor: "pointer" }} onClick={() => testBodyFour(7)}>Location</span></th>
                         {accessType === 0 ? (<th><span>Remove</span></th>) : null}
-                        {accessType < 2 ? (<th><span>Edit</span></th> ) : null}
-                        
+                        {accessType < 2 ? (<th><span>Edit</span></th>) : null}
+
                     </tr>
                 </thead>
 
@@ -199,43 +211,17 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, item
                                 <td><input onChange={(event) => setNewIpAddress(event.target.value)} style={{ width: "100%" }} value={newIpAddress}></input></td>
                                 <td>
                                     <select onChange={(event) => setNewCategory(event.target.value)}>
-                                        <option onClick={() => setNewCategory("Audio System")}>Audio System</option>
-                                        <option onClick={() => setNewCategory("Control System")}>Control System</option>
-                                        <option onClick={() => setNewCategory("Digital Media Module")}>Digital Media Module</option>
-                                        <option onClick={() => setNewCategory("Digital Media Switcher")}>Digital Media Module</option>
-                                        <option onClick={() => setNewCategory("Ethernet Control Module")}>Ethernet Control Module</option>
-                                        <option onClick={() => setNewCategory("Ethernet Switch")}>Ethernet Switch</option>
-                                        <option onClick={() => setNewCategory("Modular Multi-Tuner")}>Modular Multi-Tuner</option>
-                                        <option onClick={() => setNewCategory("Power Supply")}>Power Supply</option>
-                                        <option onClick={() => setNewCategory("Touchless Panel")}>Touchless Panel</option>
-                                        <option onClick={() => setNewCategory("Wireless Gateway")}>Wireless Gateway</option>
+                                        {categories ? categories.map((body: any) => <option onClick={() => setNewCategory(body.name)}>{body.name}</option>) : null}
                                     </select>
                                 </td>
                                 <td>
                                     <select onChange={(event) => setNewOwner(event.target.value)}>
-                                        <option onClick={() => setNewOwner("Barry Vandenberg")}>Barry Vandenberg</option>
-                                        <option onClick={() => setNewOwner("Christopher Rossi")}>Christopher Rossi</option>
-                                        <option onClick={() => setNewOwner("Cinto Frausto")}>Cinto Frausto</option>
-                                        <option onClick={() => setNewOwner("DK Karnoscak")}>DK Karnoscak</option>
-                                        <option onClick={() => setNewOwner("Eric Stover")}>Eric Stover</option>
-                                        <option onClick={() => setNewOwner("James Gaylor")}>James Gaylor</option>
-                                        <option onClick={() => setNewOwner("Lamont Moore")}>Lamont Moore</option>
-                                        <option onClick={() => setNewOwner("Mark Reilly")}>Mark Reilly</option>
-                                        <option onClick={() => setNewOwner("Robert Kirby")}>Robert Kirby</option>
-                                        <option onClick={() => setNewOwner("Rodrigo Ceballos")}>Rodrigo Ceballos</option>
-                                        <option onClick={() => setNewOwner("Ronnie Giron")}>Ronnie Giron</option>
-                                        <option onClick={() => setNewOwner("Ryan Kasher")}>Ryan Kasher</option>
-                                        <option onClick={() => setNewOwner("Ryan Kemper")}>Ryan Kemper</option>
-                                        <option onClick={() => setNewOwner("Toby Ortiz")}>Toby Ortiz</option>
-                                        <option onClick={() => setNewOwner("Tres Little")}>Tres Little</option>
-                                        <option onClick={() => setNewOwner("William Resendez")}>William Resendez</option>
+                                        {owners ? owners.map((body: any) => <option onClick={() => setNewOwner(body.name)}>{body.name}</option>) : null}
                                     </select>
                                 </td>
                                 <td>
                                     <select onChange={(event) => setNewLocation(event.target.value)}>
-                                        <option onClick={() => setNewLocation("New Jersey ATSG Lab")}>New Jersey ATSG Lab</option>
-                                        <option onClick={() => setNewLocation("Plano ATSG Lab")}>Plano ATSG Lab</option>
-                                        <option onClick={() => setNewLocation("ATSG Remote Lab")}>ATSG Remote Lab</option>
+                                        {locations ? locations.map((body: any) => <option onClick={() => setNewLocation(body.name)}>{body.name}</option>) : null}
                                     </select>
                                 </td>
                                 <td><button onClick={() => testBodyThree(info.id, items)}>Confirm</button></td>
@@ -249,10 +235,10 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, item
                             <td>{info.category}</td>
                             <td>{info.owner}</td>
                             <td>{info.location}</td>
-                                {accessType === 0 ? (<td><button onClick={() => testBodyTwo(info.id)}>Delete</button></td>) : null}
-                                {accessType < 2 ? (<td><button onClick={() => selectEdit(info)}>Edit</button></td>) : null}
-                            
-                          
+                            {accessType === 0 ? (<td><button onClick={() => testBodyTwo(info.id)}>Delete</button></td>) : null}
+                            {accessType < 2 ? (<td><button onClick={() => selectEdit(info)}>Edit</button></td>) : null}
+
+
                         </tr>)
                         }
                     </tbody>
@@ -260,11 +246,10 @@ function InvList({ isLoading, getInventory, postInventory, deleteInventory, item
 
             </table>)}
 
-            <div> accesstyle : {accessType}</div>
         </div>
 
 
-        </ React.Fragment>
+    </React.Fragment>
     );
 }
 
@@ -273,11 +258,17 @@ const mapStateToProps = (state: {
         items: InventoryItem[];
         isLoading: boolean;
         accessType: number;
+        owners: string[],
+        categories: string[],
+        locations: string[]
     };
 }) => ({
     items: state.inventoryItems.items,
     isLoading: state.inventoryItems.isLoading,
-    accessType: state.inventoryItems.accessType
+    accessType: state.inventoryItems.accessType,
+    owners: state.inventoryItems.owners,
+        locations: state.inventoryItems.locations,
+        categories: state.inventoryItems.categories,
 });
 
 const mapDispatchToProps = (dispatch: (arg0: any) => void) => ({
@@ -293,6 +284,7 @@ const findItem = (id: number, lists: any[]) => {
 
     var index = 0;
     lists.forEach(element => {
+        console.log("found element id: " + element.id)
         if (element.id === id) {
             index = lists.indexOf(element)
         }

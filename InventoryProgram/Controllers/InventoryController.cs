@@ -22,15 +22,14 @@ namespace InventoryProgram.Controllers
             _context = context;
         }
         //Shows data from database
-        [HttpGet("{id}")]
-        public async Task<object> GetAsync([FromRoute]string id)
+        [HttpGet]
+        public async Task<object> GetAsync()
         {
             var owners = await _context.Owner.ToListAsync();
             var locations= await _context.Locations.ToListAsync();
             var categories = await _context.Categories.ToListAsync();
-            var user = await _context.UserInfos.FindAsync(Int32.Parse(id));
             var type = await _context.Inventory.ToListAsync();
-            return new { items = type, accessType = user.Id, categories = categories, locations = locations, owners = owners}; 
+            return new { items = type, categories = categories, locations = locations, owners = owners}; 
         }
         //Add a product to Inventory List
         [HttpPost]
@@ -40,6 +39,34 @@ namespace InventoryProgram.Controllers
             await _context.SaveChangesAsync();
             return inventory;
         }
+
+        // Add a category to dropdown list
+        [HttpPost("category")]
+        public async Task<object> NewCategory([FromBody] string categorie)
+        {
+            await _context.Categories.AddAsync(new Categories { Name = categorie });
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        // Add a owner to dropdown list
+        [HttpPost("owner")]
+        public async Task<object> NewOwner([FromBody] string owner)
+        {
+            await _context.Owner.AddAsync(new Owner { Name = owner});
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        // Add a location to dropdown list
+        [HttpPost("location")]
+        public async Task<object> NewLocation([FromBody] string locations)
+        {
+            await _context.Locations.AddAsync(new Locations { Name = locations });
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
 
         //Delete a product from Inventory List
         [HttpDelete("delete/{id}")]
