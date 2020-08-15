@@ -24,7 +24,7 @@ namespace InventoryProgram
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<InventoryContext>(opt =>
-                opt.UseSqlServer("Data Source=localhost;Initial Catalog=Inventory;Integrated Security=True"));
+                opt.UseSqlServer("Server=localhost;Database=master;Trusted_Connection=True;"));
             services.AddTransient<InventoryContext>();
 
             services.AddControllersWithViews();
